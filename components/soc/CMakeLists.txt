@@ -47,6 +47,7 @@ endif()
 # include directories appear first in the compile command.
 add_subdirectory(src/${target})
 target_include_directories(${COMPONENT_LIB} PUBLIC include)
-
+target_include_directories(${COMPONENT_LIB} PUBLIC soc/include) # JFM
+target_include_directories(${COMPONENT_LIB} PUBLIC soc/${target}/include) # JFM
 add_subdirectory(soc)
 target_link_libraries(${COMPONENT_LIB} PUBLIC "soc_${target}")
