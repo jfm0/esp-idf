@@ -40,6 +40,8 @@
 
 #if HID_DYNAMIC_MEMORY == FALSE
 tHID_HOST_CTB   hh_cb;
+#else
+tHID_HOST_CTB  *hidh_cb_ptr;
 #endif
 
 static void hidh_search_callback (UINT16 sdp_result);
@@ -223,6 +225,10 @@ static void hidh_search_callback (UINT16 sdp_result)
 *******************************************************************************/
 void HID_HostInit (void)
 {
+#if HID_DYNAMIC_MEMORY == TRUE
+    hidh_cb_ptr = osi_malloc(sizeof(tHID_HOST_CTB));
+#endif
+
     memset(&hh_cb, 0, sizeof(tHID_HOST_CTB));
 
 #if defined(HID_INITIAL_TRACE_LEVEL)

@@ -234,7 +234,7 @@ void BTA_GATTS_AddCharacteristic (UINT16 service_id,  const tBT_UUID  * p_char_u
         if(control !=NULL){
             p_buf->control.auto_rsp = control->auto_rsp;
         }
-        if(attr_val != NULL){
+        if(attr_val != NULL && len != 0){
             APPL_TRACE_DEBUG("!!!!!!attr_val->attr_len = %x\n",attr_val->attr_len);
             APPL_TRACE_DEBUG("!!!!!!!attr_val->attr_max_len = %x\n",attr_val->attr_max_len);
             p_buf->attr_val.attr_len = attr_val->attr_len;
