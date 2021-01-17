@@ -618,7 +618,7 @@ static i2s_dma_t *i2s_create_dma_queue(i2s_port_t i2s_num, int dma_buf_count, in
             i2s_destroy_dma_queue(i2s_num, dma);
             return NULL;
         }
-        ESP_LOGD(I2S_TAG, "Addr[%d] = %d", bux_idx, (int)dma->buf[bux_idx]);
+        ESP_LOGD(I2S_TAG, "Addr[%d] = 0x%x", bux_idx, (int)dma->buf[bux_idx]);
     }
 
     dma->desc = (lldesc_t**) malloc(sizeof(lldesc_t*) * dma_buf_count);

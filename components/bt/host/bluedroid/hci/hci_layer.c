@@ -421,7 +421,7 @@ static bool filter_incoming_event(BT_HDR *packet)
     STREAM_TO_UINT8(event_code, stream);
     STREAM_SKIP_UINT8(stream); // Skip the parameter total length field
 
-    HCI_TRACE_DEBUG("Receive packet event_code=0x%x\n", event_code);
+    HCI_TRACE_DEBUG("Receive packet event_code=0x%x", event_code);
 
     if (event_code == HCI_COMMAND_COMPLETE_EVT) {
         STREAM_TO_UINT8(hci_host_env.command_credits, stream);

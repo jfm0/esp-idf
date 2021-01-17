@@ -380,6 +380,9 @@ BOOLEAN BTM_GetSecurityFlagsByTransport (BD_ADDR bd_addr, UINT8 *p_sec_flags,
 *******************************************************************************/
 void BTM_SetPinType (UINT8 pin_type, PIN_CODE pin_code, UINT8 pin_code_len)
 {
+#if !UC_BT_STACK_NO_LOG
+    pin_code[pin_code_len] = '\0';
+#endif
     BTM_TRACE_API ("BTM_SetPinType: pin type %d [variable-0, fixed-1], code %s, length %d\n",
                    pin_type, (char *) pin_code, pin_code_len);
 
