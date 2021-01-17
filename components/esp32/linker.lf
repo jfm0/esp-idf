@@ -8,3 +8,10 @@ entries:
 archive: libgcov.a
 entries:
     * (noflash)
+
+[mapping:esp32]
+archive: libesp32.a
+entries:
+    # this one didn't seem to work, i(jfm) removed the IRAM_ATTR from sleep_modes.c
+    sleep_modes:esp_sleep_start (flash)
+    

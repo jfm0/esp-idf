@@ -90,6 +90,12 @@ entries:
     bss -> rtc_bss
     common -> rtc_bss
 
+[scheme:flash]
+entries:
+    text -> flash_text
+    rodata -> flash_rodata
+    iram -> flash_text
+
 [scheme:noflash]
 entries:
     text -> iram0_text

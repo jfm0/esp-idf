@@ -174,7 +174,7 @@ static void IRAM_ATTR resume_uarts(void)
     }
 }
 
-static uint32_t IRAM_ATTR esp_sleep_start(uint32_t pd_flags)
+static uint32_t esp_sleep_start(uint32_t pd_flags)
 {
     // Stop UART output so that output is not lost due to APB frequency change.
     // For light sleep, suspend UART output — it will resume after wakeup.
@@ -222,7 +222,7 @@ static uint32_t IRAM_ATTR esp_sleep_start(uint32_t pd_flags)
     return result;
 }
 
-void IRAM_ATTR esp_deep_sleep_start(void)
+void esp_deep_sleep_start(void)
 {
     // record current RTC time
     s_config.rtc_ticks_at_sleep_start = rtc_time_get();

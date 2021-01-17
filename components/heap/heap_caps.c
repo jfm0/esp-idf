@@ -39,7 +39,7 @@ static esp_alloc_failed_hook_t alloc_failed_callback;
   IRAM in such a way that it can be later freed. It assumes both the address as well as the length to be word-aligned.
   It returns a region that's 1 word smaller than the region given because it stores the original Dram address there.
 */
-IRAM_ATTR static void *dram_alloc_to_iram_addr(void *addr, size_t len)
+static void *dram_alloc_to_iram_addr(void *addr, size_t len)
 {
     uintptr_t dstart = (uintptr_t)addr; //First word
     uintptr_t dend = dstart + len - 4; //Last word
@@ -59,10 +59,16 @@ IRAM_ATTR static void *dram_alloc_to_iram_addr(void *addr, size_t len)
 
 static void heap_caps_alloc_failed(size_t requested_size, uint32_t caps, const char *function_name) 
 {
+    if(requested_size > 64 && (caps & MALLOC_CAP_INTERNAL) != 0 ) {
+        // ignore large internal allocations for now
+        return;
+    }
     if (alloc_failed_callback) {
         alloc_failed_callback(requested_size, caps, function_name);
     }
 
+    printf("FAIL: %d, 0x%08X: %s\n", requested_size, caps, function_name);
+    heap_caps_print_heap_info(caps);
     #ifdef CONFIG_HEAP_ABORT_WHEN_ALLOCATION_FAILS
     esp_system_abort("Memory allocation failed");
     #endif
@@ -87,7 +93,7 @@ bool heap_caps_match(const heap_t *heap, uint32_t caps)
 /*
 Routine to allocate a bit of memory with certain capabilities. caps is a bitfield of MALLOC_CAP_* bits.
 */
-IRAM_ATTR void *heap_caps_malloc( size_t size, uint32_t caps )
+void *heap_caps_malloc( size_t size, uint32_t caps )
 {
     void *ret = NULL;
 
@@ -113,6 +119,9 @@ IRAM_ATTR void *heap_caps_malloc( size_t size, uint32_t caps )
     }
 
     if (caps & MALLOC_CAP_32BIT) {
+        //unsupported, needed to remove heap_caps from iram (jfm)
+        return NULL;
+
         /* 32-bit accessible RAM should allocated in 4 byte aligned sizes
          * (Future versions of ESP-IDF should possibly fail if an invalid size is requested)
          */
@@ -171,7 +180,7 @@ void heap_caps_malloc_extmem_enable(size_t limit)
 /*
  Default memory allocation implementation. Should return standard 8-bit memory. malloc() essentially resolves to this function.
 */
-IRAM_ATTR void *heap_caps_malloc_default( size_t size )
+void *heap_caps_malloc_default( size_t size )
 {
     if (malloc_alwaysinternal_limit==MALLOC_DISABLE_EXTERNAL_ALLOCS) {
         return heap_caps_malloc( size, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL);
@@ -194,7 +203,7 @@ IRAM_ATTR void *heap_caps_malloc_default( size_t size )
  Same for realloc()
  Note: keep the logic in here the same as in heap_caps_malloc_default (or merge the two as soon as this gets more complex...)
  */
-IRAM_ATTR void *heap_caps_realloc_default( void *ptr, size_t size )
+void *heap_caps_realloc_default( void *ptr, size_t size )
 {
     if (malloc_alwaysinternal_limit==MALLOC_DISABLE_EXTERNAL_ALLOCS) {
         return heap_caps_realloc( ptr, size, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL );
@@ -216,7 +225,7 @@ IRAM_ATTR void *heap_caps_realloc_default( void *ptr, size_t size )
 /*
  Memory allocation as preference in decreasing order.
  */
-IRAM_ATTR void *heap_caps_malloc_prefer( size_t size, size_t num, ... )
+void *heap_caps_malloc_prefer( size_t size, size_t num, ... )
 {
     va_list argp;
     va_start( argp, num );
@@ -235,7 +244,7 @@ IRAM_ATTR void *heap_caps_malloc_prefer( size_t size, size_t num, ... )
 /*
  Memory reallocation as preference in decreasing order.
  */
-IRAM_ATTR void *heap_caps_realloc_prefer( void *ptr, size_t size, size_t num, ... )
+void *heap_caps_realloc_prefer( void *ptr, size_t size, size_t num, ... )
 {
     va_list argp;
     va_start( argp, num );
@@ -254,7 +263,7 @@ IRAM_ATTR void *heap_caps_realloc_prefer( void *ptr, size_t size, size_t num, ..
 /*
  Memory callocation as preference in decreasing order.
  */
-IRAM_ATTR void *heap_caps_calloc_prefer( size_t n, size_t size, size_t num, ... )
+void *heap_caps_calloc_prefer( size_t n, size_t size, size_t num, ... )
 {
     va_list argp;
     va_start( argp, num );
@@ -274,7 +283,7 @@ IRAM_ATTR void *heap_caps_calloc_prefer( size_t n, size_t size, size_t num, ... 
    (This confirms if ptr is inside the heap's region, doesn't confirm if 'ptr'
    is an allocated block or is some other random address inside the heap.)
 */
-IRAM_ATTR static heap_t *find_containing_heap(void *ptr )
+static heap_t *find_containing_heap(void *ptr )
 {
     intptr_t p = (intptr_t)ptr;
     heap_t *heap;
@@ -286,7 +295,7 @@ IRAM_ATTR static heap_t *find_containing_heap(void *ptr )
     return NULL;
 }
 
-IRAM_ATTR void heap_caps_free( void *ptr)
+void heap_caps_free( void *ptr)
 {
     if (ptr == NULL) {
         return;
@@ -305,7 +314,7 @@ IRAM_ATTR void heap_caps_free( void *ptr)
     multi_heap_free(heap->heap, ptr);
 }
 
-IRAM_ATTR void *heap_caps_realloc( void *ptr, size_t size, int caps)
+void *heap_caps_realloc( void *ptr, size_t size, int caps)
 {
     bool ptr_in_diram_case = false;
     heap_t *heap = NULL;
@@ -383,7 +392,7 @@ IRAM_ATTR void *heap_caps_realloc( void *ptr, size_t size, int caps)
     return NULL;
 }
 
-IRAM_ATTR void *heap_caps_calloc( size_t n, size_t size, uint32_t caps)
+void *heap_caps_calloc( size_t n, size_t size, uint32_t caps)
 {
     void *result;
     size_t size_bytes;
@@ -540,7 +549,7 @@ size_t heap_caps_get_allocated_size( void *ptr )
     return size;
 }
 
-IRAM_ATTR void *heap_caps_aligned_alloc(size_t alignment, size_t size, int caps)
+void *heap_caps_aligned_alloc(size_t alignment, size_t size, int caps)
 {
     void *ret = NULL;
 
@@ -613,7 +622,7 @@ void *heap_caps_aligned_calloc(size_t alignment, size_t n, size_t size, uint32_t
     return ptr;
 }
 
-IRAM_ATTR void heap_caps_aligned_free(void *ptr)
+void heap_caps_aligned_free(void *ptr)
 {
     if (ptr == NULL) {
         return;

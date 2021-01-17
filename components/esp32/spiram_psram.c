@@ -199,7 +199,7 @@ typedef struct {
     uint32_t dummyBitLen;
 } psram_cmd_t;
 
-static void IRAM_ATTR psram_cache_init(psram_cache_mode_t psram_cache_mode, psram_vaddr_mode_t vaddrmode);
+static void psram_cache_init(psram_cache_mode_t psram_cache_mode, psram_vaddr_mode_t vaddrmode);
 
 static void psram_clear_spi_fifo(psram_spi_num_t spi_num)
 {
@@ -441,7 +441,7 @@ static void psram_read_id(psram_spi_num_t spi_num, uint64_t* dev_id)
 }
 
 //enter QPI mode
-static esp_err_t IRAM_ATTR psram_enable_qio_mode(psram_spi_num_t spi_num)
+static esp_err_t psram_enable_qio_mode(psram_spi_num_t spi_num)
 {
     psram_cmd_t ps_cmd;
     uint32_t addr = (PSRAM_ENTER_QMODE << 24) | 0;
@@ -661,7 +661,7 @@ void psram_set_cs_timing(psram_spi_num_t spi_num, psram_clk_mode_t clk_mode)
 }
 
 //spi param init for psram
-void IRAM_ATTR psram_spi_init(psram_spi_num_t spi_num, psram_cache_mode_t mode)
+void psram_spi_init(psram_spi_num_t spi_num, psram_cache_mode_t mode)
 {
     CLEAR_PERI_REG_MASK(SPI_SLAVE_REG(spi_num), SPI_TRANS_DONE << 5);
     // SPI_CPOL & SPI_CPHA
@@ -681,7 +681,7 @@ void IRAM_ATTR psram_spi_init(psram_spi_num_t spi_num, psram_cache_mode_t mode)
 }
 
 //psram gpio init , different working frequency we have different solutions
-static void IRAM_ATTR psram_gpio_config(psram_io_t *psram_io, psram_cache_mode_t mode)
+static void psram_gpio_config(psram_io_t *psram_io, psram_cache_mode_t mode)
 {
     int spi_cache_dummy = 0;
     uint32_t rd_mode_reg = READ_PERI_REG(SPI_CTRL_REG(0));
@@ -801,7 +801,7 @@ bool psram_is_32mbit_ver0(void)
  * Psram mode init will overwrite original flash speed mode, so that it is possible to change psram and flash speed after OTA.
  * Flash read mode(QIO/QOUT/DIO/DOUT) will not be changed in app bin. It is decided by bootloader, OTA can not change this mode.
  */
-esp_err_t IRAM_ATTR psram_enable(psram_cache_mode_t mode, psram_vaddr_mode_t vaddrmode)   //psram init
+esp_err_t psram_enable(psram_cache_mode_t mode, psram_vaddr_mode_t vaddrmode)   //psram init
 {
     psram_io_t psram_io={0};
     uint32_t chip_ver = REG_GET_FIELD(EFUSE_BLK0_RDATA3_REG, EFUSE_RD_CHIP_VER_PKG);
@@ -991,7 +991,7 @@ esp_err_t IRAM_ATTR psram_enable(psram_cache_mode_t mode, psram_vaddr_mode_t vad
 }
 
 //register initialization for sram cache params and r/w commands
-static void IRAM_ATTR psram_cache_init(psram_cache_mode_t psram_cache_mode, psram_vaddr_mode_t vaddrmode)
+static void psram_cache_init(psram_cache_mode_t psram_cache_mode, psram_vaddr_mode_t vaddrmode)
 {
     switch (psram_cache_mode) {
         case PSRAM_CACHE_F80M_S80M:

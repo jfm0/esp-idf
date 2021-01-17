@@ -3,3 +3,28 @@ archive: libheap.a
 entries:
     multi_heap (noflash)
     multi_heap_poisoning (noflash)
+    multi_heap:multi_heap_malloc (default)
+    multi_heap:multi_heap_malloc_impl (default)
+    multi_heap:multi_heap_get_info (default)
+    multi_heap:multi_heap_get_info_impl (default)
+    multi_heap:multi_heap_register (default)
+    multi_heap:multi_heap_register_impl (default)
+    multi_heap:multi_heap_free (default)
+    multi_heap:multi_heap_free_impl (default)
+    multi_heap:multi_heap_get_allocated_size (default)
+    multi_heap:multi_heap_get_allocated_size_impl (default)
+    multi_heap:multi_heap_free_size (default)
+    multi_heap:multi_heap_free_size_impl (default)
+    multi_heap:multi_heap_realloc (default)
+    multi_heap:split_if_necessary (default)
+    multi_heap:merge_adjacent (default)
+    #multi_heap_poisoning:multi_heap_internal_poison_fill_region (default)
+    #heap_caps:heap_caps_realloc (flash)
+    #heap_caps:heap_caps_malloc (flash)
+    # heap_caps_calloc_prefer
+    # heap_caps_malloc_prefer
+    # heap_caps_realloc_default
+    # heap_caps_malloc_default
+    # heap_caps_free
+    # heap_caps_calloc
+    # find_containing_heap

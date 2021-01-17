@@ -2,3 +2,6 @@
 archive: libesp_ringbuf.a
 entries:
     * (noflash_text)
+    ringbuf:xRingbufferCreate (default)
+    ringbuf:prvInitializeNewRingbuffer (default)
+    
